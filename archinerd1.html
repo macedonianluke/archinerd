@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archi Nerd</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        body {
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+        
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background-color: #0a0a0a;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        
+        .logo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            border-radius: 4px;
+            color: white;
+            font-size: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.2) 50%,
+                transparent 70%
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+        
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .header-button {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .header-button:hover {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            padding-top: 48px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #0f0f0f;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+            font-weight: 500;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        
+        .folder {
+            padding: 6px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .folder:hover {
+            background-color: #1a1a1a;
+        }
+        
+        .folder.active {
+            background-color: #1a1a1a;
+        }
+        
+        .folder.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ff7e5f;
+        }
+        
+        .folder-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .folder.open .folder-icon::before {
+            content: "▼";
+            font-size: 10px;
+        }
+        
+        .folder.closed .folder-icon::before {
+            content: "▶";
+            font-size: 10px;
+        }
+        
+        .folder-name {
+            font-size: 13px;
+            color: #e0e0e0;
+            flex: 1;
+        }
+        
+        .folder-count {
+            font-size: 11px;
+            color: #666;
+            margin-left: 4px;
+        }
+        
+        .folder-contents {
+            display: none;
+            padding-left: 24px;
+        }
+        
+        .folder.open .folder-contents {
+            display: block;
+        }
+        
+        .file {
+            padding: 4px 16px 4px 40px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #aaa;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .file:hover {
+            color: #e0e0e0;
+            background-color: #1a1a1a;
+        }
+        
+        .file.active {
+            color: #e0e0e0;
+            background-color: #1a1a1a;
+        }
+        
+        .file.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ff7e5f;
+        }
+        
+        .subfolder {
+            padding: 4px 16px 4px 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .subfolder:hover {
+            background-color: #1a1a1a;
+        }
+        
+        .subfolder.active {
+            background-color: #1a1a1a;
+        }
+        
+        .subfolder.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ff7e5f;
+        }
+        
+        .subfolder-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .subfolder.open .subfolder-icon::before {
+            content: "▼";
+            font-size: 10px;
+        }
+        
+        .subfolder.closed .subfolder-icon::before {
+            content: "▶";
+            font-size: 10px;
+        }
+        
+        .subfolder-name {
+            font-size: 13px;
+            color: #e0e0e0;
+            flex: 1;
+        }
+        
+        .subfolder-count {
+            font-size: 11px;
+            color: #666;
+            margin-left: 4px;
+        }
+        
+        .subfolder-contents {
+            display: none;
+            padding-left: 24px;
+        }
+        
+        .subfolder.open .subfolder-contents {
+            display: block;
+        }
+        
+        .subfile {
+            padding: 4px 16px 4px 64px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #aaa;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .subfile:hover {
+            color: #e0e0e0;
+            background-color: #1a1a1a;
+        }
+        
+        .subfile.active {
+            color: #e0e0e0;
+            background-color: #1a1a1a;
+        }
+        
+        .subfile.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #ff7e5f;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0a0a0a;
+        }
+        
+        /* Editor Header */
+        .editor-header {
+            height: 36px;
+            background-color: #0f0f0f;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        
+        .editor-tabs {
+            display: flex;
+            gap: 1px;
+        }
+        
+        .editor-tab {
+            height: 36px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .editor-tab:hover {
+            color: #bbb;
+        }
+        
+        .editor-tab.active {
+            color: #e0e0e0;
+            border-bottom-color: #ff7e5f;
+        }
+        
+        .editor-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 4px;
+        }
+        
+        .editor-button {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .editor-button:hover {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        /* Editor Toolbar */
+        .editor-toolbar {
+            height: 36px;
+            background-color: #0f0f0f;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+        }
+        
+        .toolbar-button {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .toolbar-button:hover {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 20px;
+            background-color: #333;
+        }
+        
+        /* Editor Content */
+        .editor-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .editor-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+        
+        .note-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .note-header {
+            margin-bottom: 24px;
+        }
+        
+        .note-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+            border: none;
+            background: transparent;
+            width: 100%;
+        }
+        
+        .note-title:focus {
+            outline: none;
+            border-bottom: 1px solid #ff7e5f;
+        }
+        
+        .note-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .note-body {
+            line-height: 1.6;
+            color: #ccc;
+            min-height: 200px;
+            border: none;
+            background: transparent;
+            width: 100%;
+            resize: none;
+        }
+        
+        .note-body:focus {
+            outline: none;
+        }
+        
+        .note-body p {
+            margin-bottom: 16px;
+        }
+        
+        .note-body ul {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+        
+        .note-body li {
+            margin-bottom: 8px;
+        }
+        
+        .note-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        .tag {
+            padding: 4px 8px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ff7e5f;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tag:hover {
+            background-color: #252525;
+            border-color: #ff7e5f;
+        }
+        
+        .tag-input-container {
+            display: flex;
+            margin-top: 16px;
+        }
+        
+        .tag-input {
+            background: none;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #e0e0e0;
+            padding: 6px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            flex: 1;
+            margin-right: 8px;
+        }
+        
+        .tag-input:focus {
+            outline: none;
+            border-color: #ff7e5f;
+        }
+        
+        .add-tag-button {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #888;
+            padding: 6px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-tag-button:hover {
+            background-color: #252525;
+            color: #e0e0e0;
+            border-color: #ff7e5f;
+        }
+        
+        /* Terminal */
+        .terminal {
+            margin-top: 32px;
+            background-color: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .terminal-header {
+            background-color: #1a1a1a;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #333;
+        }
+        
+        .terminal-body {
+            padding: 12px;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .terminal-line {
+            display: flex;
+            margin-bottom: 4px;
+        }
+        
+        .terminal-prompt {
+            color: #ff7e5f;
+            margin-right: 8px;
+        }
+        
+        .terminal-command {
+            color: #e0e0e0;
+        }
+        
+        .terminal-output {
+            color: #aaa;
+            margin-left: 16px;
+        }
+        
+        .terminal-success {
+            color: #4ade80;
+        }
+        
+        .terminal-list {
+            margin-left: 16px;
+            color: #aaa;
+        }
+        
+        .terminal-list-item {
+            margin-bottom: 4px;
+        }
+        
+        .terminal-input {
+            display: flex;
+            margin-top: 8px;
+        }
+        
+        .terminal-input input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #e0e0e0;
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+        
+        /* Command Palette */
+        .command-palette {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 4px;
+            display: flex;
+            gap: 2px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .command-palette-item {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .command-palette-item:hover {
+            background-color: #252525;
+            color: #e0e0e0;
+        }
+        
+        .command-palette-item.active {
+            background-color: #252525;
+            color: #ff7e5f;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 300px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 4px 8px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .search-input {
+            background: none;
+            border: none;
+            outline: none;
+            color: #e0e0e0;
+            flex: 1;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+        
+        .search-icon {
+            color: #666;
+            margin-right: 8px;
+        }
+        
+        .voice-button {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .voice-button:hover {
+            background-color: #252525;
+            color: #e0e0e0;
+        }
+        
+        .voice-button.active {
+            color: #ff7e5f;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 126, 95, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(255, 126, 95, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 126, 95, 0);
+            }
+        }
+        
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            top: 70px;
+            left: 20px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
+            min-width: 150px;
+            z-index: 200;
+        }
+        
+        .context-menu.show {
+            display: block;
+        }
+        
+        .context-menu-item {
+            padding: 6px 12px;
+            font-size: 13px;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .context-menu-item:hover {
+            background-color: #252525;
+        }
+        
+        .context-menu-item.active {
+            color: #ff7e5f;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 300;
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #e0e0e0;
+        }
+        
+        .notification-message {
+            font-size: 13px;
+            color: #aaa;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        /* Utility Classes */
+        .text-xs {
+            font-size: 12px;
+        }
+        
+        .text-sm {
+            font-size: 13px;
+        }
+        
+        .text-base {
+            font-size: 14px;
+        }
+        
+        .text-lg {
+            font-size: 18px;
+        }
+        
+        .text-xl {
+            font-size: 20px;
+        }
+        
+        .text-2xl {
+            font-size: 24px;
+        }
+        
+        .font-normal {
+            font-weight: 400;
+        }
+        
+        .font-medium {
+            font-weight: 500;
+        }
+        
+        .font-bold {
+            font-weight: 700;
+        }
+        
+        .text-gray-300 {
+            color: #d1d5db;
+        }
+        
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+        
+        .text-gray-500 {
+            color: #6b7280;
+        }
+        
+        .text-indigo-400 {
+            color: #818cf8;
+        }
+        
+        .bg-gray-900 {
+            background-color: #111827;
+        }
+        
+        .border-gray-800 {
+            border-color: #1f2937;
+        }
+        
+        .border-gray-700 {
+            border-color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-drafting-compass"></i>
+            </div>
+            <span>Archi Nerd</span>
+        </div>
+        <div class="header-actions">
+            <div class="header-button" id="searchToggle" title="Search">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="header-button" id="settingsButton" title="Settings">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="header-button" id="userButton" title="User">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                EXPLORER
+            </div>
+            <div class="sidebar-content" id="sidebarContent">
+                <!-- Folders and files will be dynamically generated here -->
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Editor Header -->
+            <div class="editor-header">
+                <div class="editor-tabs">
+                    <div class="editor-tab active" id="activeTab">welcome.txt</div>
+                </div>
+                <div class="editor-actions">
+                    <div class="editor-button" id="editModeButton" title="Edit Mode">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="editor-button" id="saveButton" title="Save">
+                        <i class="fas fa-save"></i>
+                    </div>
+                    <div class="editor-button" id="newFileButton" title="New File">
+                        <i class="fas fa-file-plus"></i>
+                    </div>
+                    <div class="editor-button" id="moreButton" title="More">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Editor Toolbar -->
+            <div class="editor-toolbar" id="editorToolbar" style="display: none;">
+                <div class="toolbar-button" id="boldButton" title="Bold">
+                    <i class="fas fa-bold"></i>
+                </div>
+                <div class="toolbar-button" id="italicButton" title="Italic">
+                    <i class="fas fa-italic"></i>
+                </div>
+                <div class="toolbar-button" id="underlineButton" title="Underline">
+                    <i class="fas fa-underline"></i>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-button" id="listButton" title="List">
+                    <i class="fas fa-list-ul"></i>
+                </div>
+                <div class="toolbar-button" id="linkButton" title="Link">
+                    <i class="fas fa-link"></i>
+                </div>
+                <div class="toolbar-divider"></div>
+                <div class="toolbar-button" id="codeButton" title="Code">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="toolbar-button" id="quoteButton" title="Quote">
+                    <i class="fas fa-quote-left"></i>
+                </div>
+            </div>
+            
+            <!-- Editor Content -->
+            <div class="editor-content">
+                <div class="editor-main">
+                    <div class="note-container" id="noteContainer">
+                        <!-- Note content will be dynamically loaded here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" data-filter="all">Show All</div>
+        <div class="context-menu-item" data-filter="verified">Verified Only</div>
+        <div class="context-menu-item" data-filter="recent">Recent Only</div>
+        <div class="context-menu-item" data-filter="popular">Most Popular</div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-container" id="searchContainer" style="display: none;">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search notes...">
+        <div class="voice-button" id="voiceButton">
+            <i class="fas fa-microphone"></i>
+        </div>
+    </div>
+    
+    <!-- Command Palette -->
+    <div class="command-palette">
+        <div class="command-palette-item" id="newNoteCommand" title="New Note">
+            <i class="fas fa-file-plus"></i>
+        </div>
+        <div class="command-palette-item" id="searchCommand" title="Search">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="command-palette-item" id="filterCommand" title="Filter">
+            <i class="fas fa-filter"></i>
+        </div>
+        <div class="command-palette-item" id="aiCommand" title="AI Analysis">
+            <i class="fas fa-brain"></i>
+        </div>
+        <div class="command-palette-item" id="exportCommand" title="Export">
+            <i class="fas fa-download"></i>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notificationTitle"></div>
+        <div class="notification-message" id="notificationMessage"></div>
+    </div>
+
+    <script>
+        // Sample note data
+        const noteData = {
+            'welcome': {
+                title: 'Welcome to Archi Nerd',
+                author: 'system',
+                modified: 'Just now',
+                size: '2.1 KB',
+                content: `<p>Welcome to Archi Nerd, your personal knowledge base for architecture and design!</p>
+                
+                <p>Here are some tips to get you started:</p>
+                <ul>
+                    <li>Use the terminal to run commands like "list" to see all notes</li>
+                    <li>Create new notes with "make new note" command</li>
+                    <li>Click on files in the explorer to view them</li>
+                    <li>Use the edit mode to modify existing notes</li>
+                    <li>Add hashtags to categorize and organize your notes</li>
+                </ul>
+                
+                <p>Happy note-taking!</p>`,
+                tags: ['#welcome', '#getting-started', '#tutorial']
+            },
+            'load-bearing': {
+                title: 'Load-Bearing Structures',
+                author: 'maria_johnson',
+                modified: '1 day ago',
+                size: '3.7 KB',
+                content: `<p>Load-bearing structures are fundamental architectural elements that transfer loads from the building to the foundation. These systems have evolved significantly throughout history.</p>
+                
+                <p>Key types of load-bearing structures include:</p>
+                <ul>
+                    <li>Load-bearing walls - Traditional masonry or concrete walls that support vertical loads</li>
+                    <li>Columns and beams - Framework systems that distribute loads efficiently</li>
+                    <li>Trusses - Triangular arrangements that span large distances with minimal material</li>
+                    <li>Arches and vaults - Curved structures that convert vertical loads into compressive forces</li>
+                </ul>
+                
+                <p>Modern load-bearing systems often combine traditional principles with advanced materials and computational design, creating efficient and expressive architectural solutions.</p>`,
+                tags: ['#structure', '#foundations', '#masonry', '#efficiency']
+            },
+            'frame-systems': {
+                title: 'Frame Systems in Architecture',
+                author: 'alex_chen',
+                modified: '3 days ago',
+                size: '4.2 KB',
+                content: `<p>Frame systems represent a significant evolution in structural design, allowing for greater flexibility in architectural expression and interior spatial organization.</p>
+                
+                <p>Primary frame system types:</p>
+                <ul>
+                    <li>Steel frames - High strength-to-weight ratio, ideal for high-rise construction</li>
+                    <li>Reinforced concrete frames - Excellent fire resistance and compressive strength</li>
+                    <li>Timber frames - Sustainable option with aesthetic warmth and versatility</li>
+                    <li>Hybrid frames - Combining materials to optimize structural performance</li>
+                </ul>
+                
+                <p>The development of frame systems liberated architecture from the constraints of load-bearing walls, enabling the open floor plans and curtain wall systems characteristic of modern architecture.</p>`,
+                tags: ['#steel', '#concrete', '#flexibility', '#modernism']
+            },
+            'shell-structures': {
+                title: 'Shell Structures: Form and Efficiency',
+                author: 'sarah_williams',
+                modified: '5 days ago',
+                size: '5.1 KB',
+                content: `<p>Shell structures represent an elegant approach to architectural design, where form and structure become one. These thin, curved surfaces efficiently distribute loads through their shape rather than mass.</p>
+                
+                <p>Notable examples of shell structures include:</p>
+                <ul>
+                    <li>Domes - Hemispherical structures that distribute loads evenly along their curvature</li>
+                    <li>Barrel vaults - Cylindrical vaults ideal for spanning rectangular spaces</li>
+                    <li>Hyperbolic paraboloids - Saddle-shaped surfaces with exceptional strength</li>
+                    <li>Free-form shells - Digitally designed surfaces optimized for structural performance</li>
+                </ul>
+                
+                <p>Contemporary shell structures leverage computational design and digital fabrication to create previously impossible forms with remarkable efficiency and minimal material use.</p>`,
+                tags: ['#curves', '#efficiency', '#digital', '#innovation']
+            },
+            'tensile': {
+                title: 'Tensile Structures: Lightweight Architecture',
+                author: 'david_kim',
+                modified: '1 week ago',
+                size: '3.9 KB',
+                content: `<p>Tensile structures represent a radical departure from traditional compression-based architecture, utilizing the high strength of materials in tension to create lightweight, expressive forms.</p>
+                
+                <p>Key components of tensile systems:</p>
+                <ul>
+                    <li>Membranes - Flexible surfaces that carry loads through tension</li>
+                    <li>Cables - High-strength steel elements that support and shape membranes</li>
+                    <li>Masts and arches - Compression elements that provide support points</li>
+                    <li>Anchorages - Foundation systems that resist tensile forces</li>
+                </ul>
+                
+                <p>From the ancient tents of nomadic cultures to contemporary stadium roofs, tensile structures demonstrate how minimal material can create maximum architectural impact when properly engineered.</p>`,
+                tags: ['#lightweight', '#membranes', '#cables', '#innovative']
+            },
+            'intumescent': {
+                title: 'Intumescent Fire-Proofing Materials',
+                author: 'jennifer_park',
+                modified: '2 days ago',
+                size: '4.1 KB',
+                content: `<p>Intumescent coatings are paint-like substances that expand when exposed to heat, forming an insulating char layer that protects underlying structural elements.</p>
+                
+                <p>Key characteristics of intumescent coatings:</p>
+                <ul>
+                    <li>Expansion ratio - Can expand up to 50 times their original thickness</li>
+                    <li>Insulation properties - The char layer has low thermal conductivity</li>
+                    <li>Application methods - Spray, brush, or roller application</li>
+                    <li>Substrate compatibility - Works on steel, wood, and other materials</li>
+                </ul>
+                
+                <p>Modern intumescent technologies have evolved to provide thinner films with equivalent fire resistance, making them more architecturally viable for exposed structural elements.</p>`,
+                tags: ['#fire-proofing', '#coatings', '#expansion', '#protection']
+            },
+            'gypsum': {
+                title: 'Gypsum-Based Fire Protection',
+                author: 'robert_garcia',
+                modified: '4 days ago',
+                size: '3.8 KB',
+                content: `<p>Gypsum boards are widely used in fire protection due to their unique properties when exposed to heat. The crystalline water content in gypsum releases as steam when heated, providing a cooling effect.</p>
+                
+                <p>Types of gypsum fire protection:</p>
+                <ul>
+                    <li>Type X gypsum - Special fire-rated boards with glass fiber reinforcement</li>
+                    <li>Shaftliner - High-density boards for elevator shafts and stairwells</li>
+                    <li>Encasement systems - Multiple layers for increased fire resistance</li>
+                    <li>Specialty boards - Moisture-resistant and impact-resistant variants</li>
+                </ul>
+                
+                <p>Gypsum systems provide cost-effective fire protection while offering additional benefits such as sound attenuation and smooth finish surfaces.</p>`,
+                tags: ['#fire-proofing', '#gypsum', '#boards', '#insulation']
+            },
+            'cementitious': {
+                title: 'Cementitious Fire-Proofing Sprays',
+                author: 'elizabeth_taylor',
+                modified: '1 week ago',
+                size: '4.5 KB',
+                content: `<p>Cementitious fire-proofing sprays are mineral-based coatings applied to structural steel elements to provide fire resistance. These materials are typically composed of gypsum, Portland cement, or vermiculite.</p>
+                
+                <p>Advantages of cementitious fire-proofing:</p>
+                <ul>
+                    <li>High temperature resistance - Can withstand temperatures over 1000°C</li>
+                    <li>Durability - Resistant to physical damage and weather exposure</li>
+                    <li>Cost-effectiveness - Lower material and installation costs</li>
+                    <li>Versatility - Can be applied to complex shapes and configurations</li>
+                </ul>
+                
+                <p>While cementitious sprays are highly effective, they typically result in thicker applications compared to intumescent coatings, which can impact architectural aesthetics.</p>`,
+                tags: ['#fire-proofing', '#cement', '#sprays', '#steel']
+            },
+            'detection': {
+                title: 'Fire Detection Systems',
+                author: 'michael_brown',
+                modified: '3 days ago',
+                size: '5.2 KB',
+                content: `<p>Fire detection systems are critical components of building safety, providing early warning of fire conditions to allow for safe evacuation and emergency response.</p>
+                
+                <p>Types of fire detection technologies:</p>
+                <ul>
+                    <li>Smoke detectors - Photoelectric and ionization sensors for smoke particles</li>
+                    <li>Heat detectors - Fixed temperature and rate-of-rise heat sensors</li>
+                    <li>Flame detectors - Infrared and ultraviolet sensors for flames</li>
+                    <li>Multi-sensor detectors - Combining multiple detection methods</li>
+                </ul>
+                
+                <p>Modern detection systems integrate with building management systems to provide intelligent responses, such as closing fire doors, activating ventilation controls, and guiding occupants to safe exits.</p>`,
+                tags: ['#fire-safety', '#detection', '#sensors', '#early-warning']
+            },
+            'suppression': {
+                title: 'Fire Suppression Systems',
+                author: 'lisa_davis',
+                modified: '5 days ago',
+                size: '4.7 KB',
+                content: `<p>Fire suppression systems are designed to extinguish or control fires in their early stages, minimizing property damage and protecting life safety.</p>
+                
+                <p>Common fire suppression systems:</p>
+                <ul>
+                    <li>Sprinkler systems - Water-based systems with heat-activated sprinkler heads</li>
+                    <li>Clean agent systems - Chemical agents that don't damage sensitive equipment</li>
+                    <li>Water mist systems - Fine water droplets for efficient cooling</li>
+                    <li>Carbon dioxide systems - Effective for electrical and flammable liquid fires</li>
+                </ul>
+                
+                <p>The selection of suppression systems depends on the occupancy type, hazard classification, and value of protected assets, with specialized systems designed for unique applications like data centers and museums.</p>`,
+                tags: ['#fire-safety', '#suppression', '#sprinklers', '#chemical-agents']
+            },
+            'compartmentation': {
+                title: 'Fire Compartmentation',
+                author: 'james_wilson',
+                modified: '1 week ago',
+                size: '4.9 KB',
+                content: `<p>Fire compartmentation is a passive fire protection strategy that divides buildings into discrete sections to contain fire and smoke spread, allowing for safe evacuation and limiting property damage.</p>
+                
+                <p>Key elements of fire compartmentation:</p>
+                <ul>
+                    <li>Fire-rated walls - Walls with specified fire resistance ratings</li>
+                    <li>Fire doors - Self-closing doors with fire resistance properties</li>
+                    <li>Fire dampers - Devices that close HVAC ducts during a fire</li>
+                    <li>Fire-stopping - Sealing penetrations in fire-rated assemblies</li>
+                </ul>
+                
+                <p>Building codes specify compartmentation requirements based on occupancy type, building height, and area, with more stringent requirements for high-risk occupancies like hospitals and high-rise buildings.</p>`,
+                tags: ['#fire-safety', '#compartmentation', '#passive-protection', '#containment']
+            },
+            'smoke': {
+                title: 'Smoke Management Systems',
+                author: 'patricia_miller',
+                modified: '2 days ago',
+                size: '4.3 KB',
+                content: `<p>Smoke management systems are designed to control the movement of smoke during a fire, maintaining tenable conditions for evacuation and firefighting operations.</p>
+                
+                <p>Smoke management strategies include:</p>
+                <ul>
+                    <li>Smoke exhaust - Mechanical removal of smoke from affected areas</li>
+                    <li>Pressurization - Maintaining positive pressure in escape routes</li>
+                    <li>Smoke barriers - Physical barriers to limit smoke spread</li>
+                    <li>Atrium smoke control - Specialized systems for large volume spaces</li>
+                </ul>
+                
+                <p>Effective smoke management is particularly critical in large buildings, healthcare facilities, and assembly occupancies where evacuation times may be extended or occupants may have limited mobility.</p>`,
+                tags: ['#fire-safety', '#smoke', '#ventilation', '#evacuation']
+            },
+            'standards': {
+                title: 'Fire Safety Standards and Codes',
+                author: 'elizabeth_taylor',
+                modified: '1 week ago',
+                size: '6.2 KB',
+                content: `<p>Fire safety standards and codes provide the regulatory framework for building design and construction, establishing minimum requirements for life safety and property protection.</p>
+                
+                <p>Major fire safety standards include:</p>
+                <ul>
+                    <li>International Building Code (IBC) - Comprehensive model code adopted throughout the US</li>
+                    <li>NFPA standards - Detailed technical standards from the National Fire Protection Association</li>
+                    <li>European Fire Standards - EN standards that regulate fire safety in the EU</li>
+                    <li>Local amendments - Region-specific requirements that address local conditions</li>
+                </ul>
+                
+                <p>These standards continuously evolve based on research, fire testing, and lessons learned from actual fire incidents, driving improvements in building safety over time.</p>`,
+                tags: ['#regulations', '#codes', '#compliance', '#global']
+            },
+            'bituminous': {
+                title: 'Bituminous Waterproofing Membranes',
+                author: 'thomas_moore',
+                modified: '3 days ago',
+                size: '4.6 KB',
+                content: `<p>Bituminous membranes are among the most common waterproofing materials, composed of asphalt or bitumen modified with polymers and reinforced with fiberglass or polyester.</p>
+                
+                <p>Types of bituminous membranes:</p>
+                <ul>
+                    <li>APP modified bitumen - Atactic polypropylene modified for UV resistance</li>
+                    <li>SBS modified bitumen - Styrene-butadiene-styrene for flexibility</li>
+                    <li>Torch-applied membranes - Heat-welded during installation</li>
+                    <li>Self-adhering membranes - Peel-and-stick application</li>
+                </ul>
+                
+                <p>Bituminous membranes provide excellent waterproofing for foundations, roofs, and below-grade applications, with service lives typically exceeding 20 years when properly installed.</p>`,
+                tags: ['#waterproofing', '#bitumen', '#membranes', '#foundations']
+            },
+            'liquid': {
+                title: 'Liquid Applied Waterproofing',
+                author: 'susan_taylor',
+                modified: '5 days ago',
+                size: '4.1 KB',
+                content: `<p>Liquid applied waterproofing systems are fluid membranes that cure to form seamless, monolithic barriers against water intrusion. These systems are particularly valuable for complex geometries and details.</p>
+                
+                <p>Common liquid applied systems:</p>
+                <ul>
+                    <li>Polyurethane coatings - Highly flexible and durable</li>
+                    <li>Polyurea coatings - Fast-curing with excellent chemical resistance</li>
+                    <li>Acrylic coatings - UV-resistant and environmentally friendly</li>
+                    <li>Cementitious coatings - Rigid systems for positive-side applications</li>
+                </ul>
+                
+                <p>Liquid applied systems excel in waterproofing irregular surfaces, penetrations, and transitions where sheet membranes would be difficult to install effectively.</p>`,
+                tags: ['#waterproofing', '#liquid', '#seamless', '#coatings']
+            },
+            'acrylic': {
+                title: 'Acrylic Waterproofing Coatings',
+                author: 'richard_jackson',
+                modified: '2 days ago',
+                size: '3.9 KB',
+                content: `<p>Acrylic waterproofing coatings are water-based systems that provide UV-resistant, breathable barriers against water intrusion. These coatings are environmentally friendly and easy to apply.</p>
+                
+                <p>Advantages of acrylic coatings:</p>
+                <ul>
+                    <li>UV resistance - Maintain flexibility and integrity when exposed to sunlight</li>
+                    <li>Breathability - Allow water vapor transmission while resisting liquid water</li>
+                    <li>Easy application - Can be applied by brush, roller, or spray</li>
+                    <li>Color options - Available in various colors for aesthetic purposes</li>
+                </ul>
+                
+                <p>Acrylic coatings are ideal for above-grade applications, balconies, and exposed waterproofing where UV resistance and aesthetic considerations are important.</p>`,
+                tags: ['#waterproofing', '#acrylic', '#coatings', '#uv-resistant']
+            },
+            'polyurethane': {
+                title: 'Polyurethane Waterproofing Systems',
+                author: 'nancy_white',
+                modified: '4 days ago',
+                size: '4.4 KB',
+                content: `<p>Polyurethane waterproofing systems offer exceptional durability and flexibility, making them suitable for demanding applications where movement and extreme conditions are expected.</p>
+                
+                <p>Characteristics of polyurethane systems:</p>
+                <ul>
+                    <li>High elongation - Can accommodate significant substrate movement</li>
+                    <li>Chemical resistance - Resistant to oils, solvents, and chemicals</li>
+                    <li>Seamless application - Forms monolithic membranes without joints</li>
+                    <li>Adhesion - Bonds well to various substrates including concrete and metal</li>
+                </ul>
+                
+                <p>Polyurethane systems are commonly used in plaza decks, parking structures, and industrial facilities where superior performance and longevity are required.</p>`,
+                tags: ['#waterproofing', '#polyurethane', '#flexible', '#durable']
+            },
+            'epoxy': {
+                title: 'Epoxy Waterproofing Systems',
+                author: 'daniel_harris',
+                modified: '1 week ago',
+                size: '4.2 KB',
+                content: `<p>Epoxy waterproofing systems are high-performance coatings that provide exceptional chemical resistance and durability. These systems are typically two-component materials that cure to form hard, impermeable barriers.</p>
+                
+                <p>Applications for epoxy systems:</p>
+                <ul>
+                    <li>Chemical containment - Resistant to a wide range of chemicals</li>
+                    <li>Industrial flooring - Durable surfaces for high-traffic areas</li>
+                    <li>Secondary containment - Linings for tanks and containment areas</li>
+                    <li>Repair mortars - High-strength materials for structural repairs</li>
+                </ul>
+                
+                <p>While epoxy systems offer superior performance, they typically require careful surface preparation and professional installation to achieve optimal results.</p>`,
+                tags: ['#waterproofing', '#epoxy', '#chemical-resistant', '#industrial']
+            },
+            'drainage': {
+                title: 'Drainage Systems in Building Envelopes',
+                author: 'karen_martin',
+                modified: '3 days ago',
+                size: '5.0 KB',
+                content: `<p>Drainage systems are critical components of building envelopes, designed to manage water infiltration and prevent moisture-related damage to building components.</p>
+                
+                <p>Key drainage system elements:</p>
+                <ul>
+                    <li>Drainage planes - Air spaces that allow water to drain downward</li>
+                    <li>Weep holes - Openings that allow water to exit the wall assembly</li>
+                    <li>Flashings - Directs water to the exterior of the building</li>
+                    <li>Foundation drains - Collect and divert groundwater away from foundations</li>
+                </ul>
+                
+                <p>Proper drainage design is essential in all climate zones, with particular importance in regions with heavy rainfall or freeze-thaw cycles that can cause significant damage if water is not properly managed.</p>`,
+                tags: ['#waterproofing', '#drainage', '#moisture', '#building-envelope']
+            },
+            'reinforced': {
+                title: 'Reinforced Concrete',
+                author: 'william_thompson',
+                modified: '2 days ago',
+                size: '5.5 KB',
+                content: `<p>Reinforced concrete is a composite material that combines concrete's high compressive strength with steel's high tensile strength, creating a versatile structural material used worldwide.</p>
+                
+                <p>Key aspects of reinforced concrete:</p>
+                <ul>
+                    <li>Reinforcement placement - Steel bars positioned to resist tensile stresses</li>
+                    <li>Bond strength - Mechanical and chemical bond between concrete and steel</li>
+                    <li>Cover requirements - Concrete cover to protect reinforcement from corrosion</li>
+                    <li>Crack control - Methods to limit cracking for durability and aesthetics</li>
+                </ul>
+                
+                <p>Modern reinforced concrete design incorporates advanced materials like fiber reinforcement and self-compacting concrete, expanding the material's capabilities for innovative architectural applications.</p>`,
+                tags: ['#concrete', '#reinforcement', '#composite', '#structural']
+            },
+            'precast': {
+                title: 'Precast Concrete Systems',
+                author: 'barbara_garcia',
+                modified: '4 days ago',
+                size: '4.8 KB',
+                content: `<p>Precast concrete systems involve casting concrete elements in a controlled factory environment, then transporting them to the construction site for assembly. This approach offers numerous advantages over traditional cast-in-place methods.</p>
+                
+                <p>Benefits of precast concrete:</p>
+                <ul>
+                    <li>Quality control - Factory conditions ensure consistent high quality</li>
+                    <li>Speed of construction - Parallel site preparation and element fabrication</li>
+                    <li>Architectural versatility - Wide range of finishes and formwork options</li>
+                    <li>Durability - Dense, high-strength concrete with controlled curing</li>
+                </ul>
+                
+                <p>Precast systems range from structural elements like beams and columns to architectural panels with integrated insulation and finishes, enabling efficient and expressive building solutions.</p>`,
+                tags: ['#concrete', '#precast', '#prefabrication', '#efficiency']
+            },
+            'high-strength': {
+                title: 'High-Strength Concrete',
+                author: 'joseph_rodriguez',
+                modified: '1 week ago',
+                size: '4.3 KB',
+                content: `<p>High-strength concrete refers to concrete with compressive strengths significantly exceeding those of conventional concrete, typically above 6,000 psi (40 MPa). These materials enable more slender structural elements and longer spans.</p>
+                
+                <p>Technologies for high-strength concrete:</p>
+                <ul>
+                    <li>Low water-cement ratio - Reduces porosity and increases strength</li>
+                    <li>Supplementary cementitious materials - Silica fume, fly ash, and slag</li>
+                    <li>Chemical admixtures - High-range water reducers and superplasticizers</li>
+                    <li>Quality control - Strict batching and curing procedures</li>
+                </ul>
+                
+                <p>High-strength concrete is essential for supertall buildings, long-span bridges, and specialized structures where material efficiency and structural performance are paramount.</p>`,
+                tags: ['#concrete', '#high-strength', '#innovative', '#performance']
+            },
+            'carbon': {
+                title: 'Carbon Steel in Construction',
+                author: 'charles_lewis',
+                modified: '3 days ago',
+                size: '4.6 KB',
+                content: `<p>Carbon steel is the most commonly used structural steel in construction, valued for its high strength, ductility, and relatively low cost. It forms the skeleton of most modern buildings and infrastructure.</p>
+                
+                <p>Key properties of carbon steel:</p>
+                <ul>
+                    <li>Strength-to-weight ratio - High strength with relatively low weight</li>
+                    <li>Ductility - Ability to deform without failure under stress</li>
+                    <li>Weldability - Can be easily joined through welding processes</li>
+                    <li>Recyclability - Can be recycled repeatedly without quality loss</li>
+                </ul>
+                
+                <p>Carbon steel structures require corrosion protection through coatings or galvanization, particularly in harsh environments or exposed applications.</p>`,
+                tags: ['#steel', '#carbon', '#structural', '#versatile']
+            },
+            'stainless': {
+                title: 'Stainless Steel Applications',
+                author: 'mary_walker',
+                modified: '5 days ago',
+                size: '4.1 KB',
+                content: `<p>Stainless steel is a corrosion-resistant alloy containing at least 10.5% chromium, which forms a passive oxide layer that protects the steel from rust and staining. While more expensive than carbon steel, it offers superior durability and aesthetic qualities.</p>
+                
+                <p>Architectural applications of stainless steel:</p>
+                <ul>
+                    <li>Cladding and curtain walls - Durable, low-maintenance exterior surfaces</li>
+                    <li>Structural elements - Columns, beams, and trusses in corrosive environments</li>
+                    <li>Roofing - Long-lasting, weather-resistant roofing systems</li>
+                    <li>Interior finishes - Railings, fixtures, and decorative elements</li>
+                </ul>
+                
+                <p>Stainless steel is particularly valuable in coastal environments, swimming pools, and food processing facilities where corrosion resistance is essential.</p>`,
+                tags: ['#steel', '#stainless', '#corrosion-resistant', '#aesthetic']
+            },
+            'alloy': {
+                title: 'Alloy Steels in Construction',
+                author: 'peter_hall',
+                modified: '2 days ago',
+                size: '4.4 KB',
+                content: `<p>Alloy steels are carbon steels with additional elements added to enhance specific properties such as strength, hardness, toughness, or corrosion resistance. These specialized materials are used in demanding structural applications.</p>
+                
+                <p>Common alloying elements and their effects:</p>
+                <ul>
+                    <li>Chromium - Increases hardness, toughness, and corrosion resistance</li>
+                    <li>Nickel - Improves toughness and low-temperature performance</li>
+                    <li>Molybdenum - Enhances strength and high-temperature performance</li>
+                    <li>Vanadium - Increases strength and wear resistance</li>
+                </ul>
+                
+                <p>Alloy steels are typically used in bridges, high-rise buildings, and specialized structures where superior mechanical properties justify their higher cost.</p>`,
+                tags: ['#steel', '#alloy', '#specialized', '#high-performance']
+            },
+            'wood': {
+                title: 'Wood in Modern Architecture',
+                author: 'susan_allen',
+                modified: '4 days ago',
+                size: '5.2 KB',
+                content: `<p>Wood is experiencing a renaissance in modern architecture, driven by sustainability concerns and technological innovations like cross-laminated timber (CLT) that enable its use in larger and taller structures.</p>
+                
+                <p>Modern wood construction systems:</p>
+                <ul>
+                    <li>Cross-laminated timber (CLT) - Solid wood panels for walls and floors</li>
+                    <li>Glued-laminated timber (Glulam) - Engineered beams and columns</li>
+                    <li>Dowel-laminated timber - Mechanical connections without adhesives</li>
+                    <li>Structural composite lumber - LVL, PSL, and LSL products</li>
+                </ul>
+                
+                <p>Wood's environmental benefits, including carbon sequestration and lower embodied energy compared to steel and concrete, make it an increasingly attractive material for sustainable architecture.</p>`,
+                tags: ['#wood', '#sustainable', '#engineered', '#renewable']
+            },
+            'composites': {
+                title: 'Composite Materials in Architecture',
+                author: 'george_young',
+                modified: '1 week ago',
+                size: '4.9 KB',
+                content: `<p>Composite materials combine two or more constituent materials with different properties to create a material with characteristics superior to its individual components. These materials are enabling new possibilities in architectural design.</p>
+                
+                <p>Architectural composite materials:</p>
+                <ul>
+                    <li>Fiber-reinforced polymers (FRP) - Glass or carbon fibers in polymer matrices</li>
+                    <li>Translucent composites - Light-transmitting panels for facades</li>
+                    <li>Engineered wood products - Combining wood with adhesives and other materials</li>
+                    <li>Concrete composites - Concrete reinforced with fibers or polymers</li>
+                </ul>
+                
+                <p>Composites offer designers unprecedented control over material properties, allowing optimization for strength, weight, thermal performance, and aesthetics.</p>`,
+                tags: ['#composites', '#innovative', '#engineered', '#versatile']
+            },
+            'passive': {
+                title: 'Passive Energy Design',
+                author: 'hernandez_king',
+                modified: '3 days ago',
+                size: '5.1 KB',
+                content: `<p>Passive energy design strategies reduce building energy consumption by harnessing natural processes like solar gain, natural ventilation, and daylighting, minimizing reliance on mechanical systems.</p>
+                
+                <p>Key passive design strategies:</p>
+                <ul>
+                    <li>Building orientation - Optimizing solar exposure and wind patterns</li>
+                    <li>Thermal mass - Using materials to store and release heat</li>
+                    <li>Natural ventilation - Designing for airflow and stack effect</li>
+                    <li>Daylighting - Maximizing natural light while minimizing heat gain</li>
+                </ul>
+                
+                <p>Passive design principles can reduce energy consumption by 40-70% compared to conventional buildings, while improving occupant comfort and connection to the natural environment.</p>`,
+                tags: ['#sustainability', '#energy', '#passive', '#efficiency']
+            },
+            'renewable': {
+                title: 'Renewable Energy Integration',
+                author: 'sandra_wright',
+                modified: '5 days ago',
+                size: '4.7 KB',
+                content: `<p>Renewable energy systems are increasingly integrated into building design, transforming structures from energy consumers to energy producers. This approach supports carbon neutrality and energy independence.</p>
+                
+                <p>Building-integrated renewable systems:</p>
+                <ul>
+                    <li>Photovoltaics - Solar panels integrated into roofs and facades</li>
+                    <li>Solar thermal - Systems for heating water and spaces</li>
+                    <li>Wind turbines - Small-scale turbines for on-site generation</li>
+                    <li>Geothermal systems - Utilizing earth's stable temperature</li>
+                </ul>
+                
+                <p>Effective renewable integration requires careful consideration of building orientation, local climate, and energy demands, with systems designed to complement rather than dominate architectural expression.</p>`,
+                tags: ['#sustainability', '#renewable', '#energy', '#integration']
+            },
+            'efficiency': {
+                title: 'Energy Efficiency in Buildings',
+                author: 'steven_lopez',
+                modified: '2 days ago',
+                size: '4.5 KB',
+                content: `<p>Energy efficiency is a cornerstone of sustainable building design, focusing on reducing energy consumption through improved building envelopes, efficient systems, and intelligent controls.</p>
+                
+                <p>Strategies for energy efficiency:</p>
+                <ul>
+                    <li>High-performance envelopes - Superior insulation and air sealing</li>
+                    <li>Efficient HVAC systems - Heat pumps, variable speed drives, and zoned controls</li>
+                    <li>Lighting efficiency - LED technology and daylight-responsive controls</li>
+                    <li>Building automation - Intelligent systems that optimize operations</li>
+                </ul>
+                
+                <p>Energy-efficient buildings not only reduce environmental impact but also offer lower operating costs, improved comfort, and enhanced resilience to energy price fluctuations.</p>`,
+                tags: ['#sustainability', '#energy', '#efficiency', '#performance']
+            },
+            'harvesting': {
+                title: 'Water Harvesting Systems',
+                author: 'michelle_hill',
+                modified: '4 days ago',
+                size: '4.2 KB',
+                content: `<p>Water harvesting systems collect and store rainwater and other sources of water for non-potable uses, reducing demand on municipal supplies and stormwater runoff.</p>
+                
+                <p>Components of water harvesting systems:</p>
+                <ul>
+                    <li>Collection surfaces - Roofs and other impervious areas</li>
+                    <li>Conveyance systems - Gutters, downspouts, and piping</li>
+                    <li>Storage tanks - Cisterns and reservoirs for water storage</li>
+                    <li>Distribution systems - Pumps and controls for water use</li>
+                </ul>
+                
+                <p>Harvested water can be used for irrigation, toilet flushing, cooling towers, and other non-potable applications, significantly reducing a building's potable water consumption.</p>`,
+                tags: ['#sustainability', '#water', '#harvesting', '#conservation']
+            },
+            'recycling': {
+                title: 'Water Recycling and Reuse',
+                author: 'ronald_scott',
+                modified: '1 week ago',
+                size: '4.4 KB',
+                content: `<p>Water recycling systems treat wastewater on-site for reuse in non-potable applications, creating closed-loop systems that minimize water consumption and discharge.</p>
+                
+                <p>Types of water recycling systems:</p>
+                <ul>
+                    <li>Greywater systems - Treating water from sinks, showers, and laundry</li>
+                    <li>Blackwater systems - Treating water from toilets and kitchens</li>
+                    <li>Condensate recovery - Collecting water from HVAC systems</li>
+                    <li>Process water recycling - Reusing water in industrial processes</li>
+                </ul>
+                
+                <p>Water recycling is particularly valuable in water-scarce regions and large buildings with high water consumption, offering both environmental and economic benefits.</p>`,
+                tags: ['#sustainability', '#water', '#recycling', '#reuse']
+            },
+            'waste': {
+                title: 'Waste Management in Buildings',
+                author: 'laura_green',
+                modified: '3 days ago',
+                size: '4.8 KB',
+                content: `<p>Effective waste management in buildings involves designing systems that minimize waste generation, facilitate recycling and composting, and properly handle residual waste.</p>
+                
+                <p>Integrated waste management strategies:</p>
+                <ul>
+                    <li>Waste reduction - Designing for minimal material waste</li>
+                    <li>Recycling systems - Dedicated collection areas and chutes</li>
+                    <li>Composting systems - On-site processing of organic waste</li>
+                    <li>Hazardous waste handling - Proper collection and disposal</li>
+                </ul>
+                
+                <p>Comprehensive waste management planning during design ensures adequate space for collection, storage, and processing systems, while making recycling and composting convenient for occupants.</p>`,
+                tags: ['#sustainability', '#waste', '#recycling', '#management']
+            },
+            'soundproofing': {
+                title: 'Soundproofing in Architecture',
+                author: 'jason_adams',
+                modified: '5 days ago',
+                size: '4.6 KB',
+                content: `<p>Soundproofing involves designing building assemblies to control sound transmission between spaces, creating acoustic environments appropriate for their intended use.</p>
+                
+                <p>Soundproofing strategies include:</p>
+                <ul>
+                    <li>Mass law - Using dense materials to block sound transmission</li>
+                    <li>Decoupling - Creating discontinuities in structural connections</li>
+                    <li>Absorption - Using materials to convert sound energy to heat</li>
+                    <li>Damping - Adding materials to reduce vibration in assemblies</li>
+                </ul>
+                
+                <p>Effective soundproofing requires addressing all paths of sound transmission, including airborne sound, structure-borne sound, and flanking paths around assemblies.</p>`,
+                tags: ['#acoustics', '#soundproofing', '#noise-control', '#isolation']
+            },
+            'absorption': {
+                title: 'Sound Absorption Materials',
+                author: 'melissa_baker',
+                modified: '2 days ago',
+                size: '4.3 KB',
+                content: `<p>Sound absorption materials reduce sound reflection within spaces, controlling reverberation and improving speech intelligibility. These materials are essential in theaters, classrooms, and open-plan offices.</p>
+                
+                <p>Common sound absorption materials:</p>
+                <ul>
+                    <li>Porous absorbers - Materials like fiberglass and mineral wool</li>
+                    <li>Panel resonators - Tuned panels that absorb specific frequencies</li>
+                    <li>Cavity resonators - Helmholtz resonators for low frequencies</li>
+                    <li>Membrane absorbers - Flexible membranes that absorb low frequencies</li>
+                </ul>
+                
+                <p>Effective acoustic design combines absorption with diffusion and reflection to create spaces with appropriate reverberation characteristics and sound distribution.</p>`,
+                tags: ['#acoustics', '#absorption', '#reverberation', '#materials']
+            },
+            'natural-lighting': {
+                title: 'Natural Lighting Design',
+                author: 'francis_nelson',
+                modified: '4 days ago',
+                size: '5.0 KB',
+                content: `<p>Natural lighting design harnesses daylight to illuminate building interiors, reducing energy consumption while creating visually comfortable and psychologically beneficial environments.</p>
+                
+                <p>Natural lighting strategies include:</p>
+                <ul>
+                    <li>Side lighting - Windows and glazed walls in building facades</li>
+                    <li>Top lighting - Skylights, clerestories, and roof monitors</li>
+                    <li>Light shelves - Horizontal surfaces that reflect light deeper into spaces</li>
+                    <li>Light tubes - Tubular devices that channel light from roof to interior</li>
+                </ul>
+                
+                <p>Effective daylighting balances illumination with heat gain and glare control, often incorporating automated shading systems and dimmable electric lighting to maintain consistent light levels.</p>`,
+                tags: ['#lighting', '#natural', '#daylighting', '#energy-efficiency']
+            },
+            'artificial': {
+                title: 'Artificial Lighting Systems',
+                author: 'jessica_carter',
+                modified: '1 week ago',
+                size: '4.7 KB',
+                content: `<p>Artificial lighting systems provide illumination when natural light is insufficient or unavailable, with modern systems emphasizing energy efficiency, user control, and integration with architectural design.</p>
+                
+                <p>Components of lighting systems:</p>
+                <ul>
+                    <li>Light sources - LED, fluorescent, and other technologies</li>
+                    <li>Luminaires - Fixtures that house and direct light sources</li>
+                    <li>Controls - Switches, dimmers, and automated systems</li>
+                    <li>Power systems - Electrical distribution and emergency backup</li>
+                </ul>
+                
+                <p>Contemporary lighting design focuses on human-centric lighting that supports circadian rhythms, enhances visual comfort, and creates appropriate atmospheres for different activities.</p>`,
+                tags: ['#lighting', '#artificial', '#led', '#controls']
+            },
+            'mechanical': {
+                title: 'Mechanical Ventilation Systems',
+                author: 'james_mitchell',
+                modified: '3 days ago',
+                size: '5.3 KB',
+                content: `<p>Mechanical ventilation systems use fans and ductwork to provide controlled air exchange in buildings, ensuring adequate indoor air quality and thermal comfort regardless of outdoor conditions.</p>
+                
+                <p>Types of mechanical ventilation:</p>
+                <ul>
+                    <li>Supply systems - Introduce fresh air into spaces</li>
+                    <li>Exhaust systems - Remove stale air from spaces</li>
+                    <li>Balanced systems - Combine supply and exhaust for controlled air exchange</li>
+                    <li>Heat recovery systems - Transfer heat between exhaust and supply air streams</li>
+                </ul>
+                
+                <p>Modern mechanical ventilation systems often incorporate filtration, humidity control, and energy recovery features to improve air quality while minimizing energy consumption.</p>`,
+                tags: ['#ventilation', '#mechanical', '#hvac', '#air-quality']
+            },
+            'natural-ventilation': {
+                title: 'Natural Ventilation Strategies',
+                author: 'amanda_perez',
+                modified: '5 days ago',
+                size: '4.9 KB',
+                content: `<p>Natural ventilation harnesses natural forces like wind and buoyancy to provide fresh air and cooling to buildings, reducing energy consumption while improving occupant connection to the outdoor environment.</p>
+                
+                <p>Natural ventilation approaches include:</p>
+                <ul>
+                    <li>Cross ventilation - Using pressure differences to move air through spaces</li>
+                    <li>Stack ventilation - Utilizing temperature differences to drive air movement</li>
+                    <li>Single-sided ventilation - Using openings in one facade for air exchange</li>
+                    <li>Wind towers and catchers - Architectural elements that capture and direct wind</li>
+                </ul>
+                
+                <p>Effective natural ventilation requires careful building orientation, operable windows, and often hybrid systems that combine natural and mechanical approaches for optimal performance.</p>`,
+                tags: ['#ventilation', '#natural', '#passive', '#cooling']
+            }
+        };
+
+        // Folder structure
+        const folderStructure = [
+            {
+                name: 'structure',
+                files: ['load-bearing', 'frame-systems', 'shell-structures', 'tensile']
+            },
+            {
+                name: 'fire-proofing',
+                subfolders: [
+                    {
+                        name: 'materials',
+                        files: ['intumescent', 'gypsum', 'cementitious']
+                    },
+                    {
+                        name: 'systems',
+                        files: ['detection', 'suppression', 'compartmentation', 'smoke']
+                    }
+                ],
+                files: ['standards']
+            },
+            {
+                name: 'water-proofing',
+                subfolders: [
+                    {
+                        name: 'membranes',
+                        files: ['bituminous', 'liquid']
+                    },
+                    {
+                        name: 'coatings',
+                        files: ['acrylic', 'polyurethane', 'epoxy']
+                    }
+                ],
+                files: ['drainage']
+            },
+            {
+                name: 'materials',
+                subfolders: [
+                    {
+                        name: 'concrete',
+                        files: ['reinforced', 'precast', 'high-strength']
+                    },
+                    {
+                        name: 'steel',
+                        files: ['carbon', 'stainless', 'alloy']
+                    }
+                ],
+                files: ['wood', 'composites']
+            },
+            {
+                name: 'sustainability',
+                subfolders: [
+                    {
+                        name: 'energy',
+                        files: ['passive', 'renewable', 'efficiency']
+                    },
+                    {
+                        name: 'water',
+                        files: ['harvesting', 'recycling']
+                    }
+                ],
+                files: ['waste']
+            },
+            {
+                name: 'acoustics',
+                files: ['soundproofing', 'absorption']
+            },
+            {
+                name: 'lighting',
+                files: ['natural-lighting', 'artificial']
+            },
+            {
+                name: 'ventilation',
+                files: ['mechanical', 'natural-ventilation']
+            }
+        ];
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate folder structure
+            generateFolderStructure();
+            
+            // Load the default note
+            loadNote('welcome');
+            
+            // Set up folder functionality
+            setupFolderNavigation();
+            
+            // Set up subfolder functionality
+            setupSubfolderNavigation();
+            
+            // Set up file selection
+            setupFileSelection();
+            
+            // Set up subfile selection
+            setupSubfileSelection();
+            
+            // Set up header actions
+            setupHeaderActions();
+            
+            // Set up editor actions
+            setupEditorActions();
+            
+            // Set up edit mode
+            setupEditMode();
+            
+            // Set up toolbar actions
+            setupToolbarActions();
+            
+            // Set up context menu
+            setupContextMenu();
+            
+            // Set up search functionality
+            setupSearch();
+            
+            // Set up voice button
+            setupVoiceButton();
+            
+            // Set up command palette
+            setupCommandPalette();
+            
+            // Set up terminal
+            setupTerminal();
+        });
+
+        // Generate folder structure
+        function generateFolderStructure() {
+            const sidebarContent = document.getElementById('sidebarContent');
+            sidebarContent.innerHTML = '';
+            
+            folderStructure.forEach(folder => {
+                const folderElement = createFolderElement(folder);
+                sidebarContent.appendChild(folderElement);
+            });
+        }
+
+        // Create folder element
+        function createFolderElement(folder) {
+            const folderDiv = document.createElement('div');
+            folderDiv.className = 'folder closed';
+            folderDiv.setAttribute('data-folder', folder.name);
+            
+            const folderIcon = document.createElement('div');
+            folderIcon.className = 'folder-icon';
+            
+            const folderName = document.createElement('div');
+            folderName.className = 'folder-name';
+            folderName.textContent = folder.name;
+            
+            // Count files and subfiles
+            let fileCount = 0;
+            if (folder.files) {
+                fileCount += folder.files.length;
+            }
+            if (folder.subfolders) {
+                folder.subfolders.forEach(subfolder => {
+                    if (subfolder.files) {
+                        fileCount += subfolder.files.length;
+                    }
+                });
+            }
+            
+            const folderCount = document.createElement('div');
+            folderCount.className = 'folder-count';
+            folderCount.textContent = fileCount;
+            
+            folderDiv.appendChild(folderIcon);
+            folderDiv.appendChild(folderName);
+            folderDiv.appendChild(folderCount);
+            
+            const folderContents = document.createElement('div');
+            folderContents.className = 'folder-contents';
+            
+            // Add subfolders
+            if (folder.subfolders) {
+                folder.subfolders.forEach(subfolder => {
+                    const subfolderElement = createSubfolderElement(subfolder);
+                    folderContents.appendChild(subfolderElement);
+                });
+            }
+            
+            // Add files
+            if (folder.files) {
+                folder.files.forEach(fileId => {
+                    if (noteData[fileId]) {
+                        const fileElement = createFileElement(fileId);
+                        folderContents.appendChild(fileElement);
+                    }
+                });
+            }
+            
+            folderDiv.appendChild(folderContents);
+            
+            return folderDiv;
+        }
+
+        // Create subfolder element
+        function createSubfolderElement(subfolder) {
+            const subfolderDiv = document.createElement('div');
+            subfolderDiv.className = 'subfolder closed';
+            subfolderDiv.setAttribute('data-subfolder', subfolder.name);
+            
+            const subfolderIcon = document.createElement('div');
+            subfolderIcon.className = 'subfolder-icon';
+            
+            const subfolderName = document.createElement('div');
+            subfolderName.className = 'subfolder-name';
+            subfolderName.textContent = subfolder.name;
+            
+            const subfolderCount = document.createElement('div');
+            subfolderCount.className = 'subfolder-count';
+            subfolderCount.textContent = subfolder.files ? subfolder.files.length : 0;
+            
+            subfolderDiv.appendChild(subfolderIcon);
+            subfolderDiv.appendChild(subfolderName);
+            subfolderDiv.appendChild(subfolderCount);
+            
+            const subfolderContents = document.createElement('div');
+            subfolderContents.className = 'subfolder-contents';
+            
+            // Add files
+            if (subfolder.files) {
+                subfolder.files.forEach(fileId => {
+                    if (noteData[fileId]) {
+                        const fileElement = createSubfileElement(fileId);
+                        subfolderContents.appendChild(fileElement);
+                    }
+                });
+            }
+            
+            subfolderDiv.appendChild(subfolderContents);
+            
+            return subfolderDiv;
+        }
+
+        // Create file element
+        function createFileElement(fileId) {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'file';
+            fileDiv.setAttribute('data-section', fileId);
+            fileDiv.textContent = `${noteData[fileId].title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+            return fileDiv;
+        }
+
+        // Create subfile element
+        function createSubfileElement(fileId) {
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'subfile';
+            fileDiv.setAttribute('data-section', fileId);
+            fileDiv.textContent = `${noteData[fileId].title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+            return fileDiv;
+        }
+
+        // Folder navigation functionality
+        function setupFolderNavigation() {
+            const folders = document.querySelectorAll('.folder');
+            
+            folders.forEach(folder => {
+                folder.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Toggle open/closed state
+                    this.classList.toggle('open');
+                    this.classList.toggle('closed');
+                    
+                    // Update active state
+                    folders.forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Log folder action
+                    const folderName = this.querySelector('.folder-name').textContent;
+                    console.log('Folder selected:', folderName);
+                });
+            });
+        }
+
+        // Subfolder navigation functionality
+        function setupSubfolderNavigation() {
+            const subfolders = document.querySelectorAll('.subfolder');
+            
+            subfolders.forEach(subfolder => {
+                subfolder.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Toggle open/closed state
+                    this.classList.toggle('open');
+                    this.classList.toggle('closed');
+                    
+                    // Update active state
+                    subfolders.forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Log subfolder action
+                    const subfolderName = this.querySelector('.subfolder-name').textContent;
+                    console.log('Subfolder selected:', subfolderName);
+                });
+            });
+        }
+
+        // File selection functionality
+        function setupFileSelection() {
+            const files = document.querySelectorAll('.file');
+            
+            files.forEach(file => {
+                file.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all files and subfiles
+                    document.querySelectorAll('.file, .subfile').forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked file
+                    this.classList.add('active');
+                    
+                    // Get the section ID
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Update editor tab title
+                    const tab = document.getElementById('activeTab');
+                    tab.textContent = this.textContent;
+                    
+                    // Load the note content
+                    loadNote(sectionId);
+                    
+                    // Add terminal command
+                    addTerminalCommand(`open ${this.textContent}`, `Loaded ${this.textContent} successfully`, 'success');
+                });
+            });
+        }
+
+        // Subfile selection functionality
+        function setupSubfileSelection() {
+            const subfiles = document.querySelectorAll('.subfile');
+            
+            subfiles.forEach(subfile => {
+                subfile.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all files and subfiles
+                    document.querySelectorAll('.file, .subfile').forEach(f => f.classList.remove('active'));
+                    
+                    // Add active class to clicked subfile
+                    this.classList.add('active');
+                    
+                    // Get the section ID
+                    const sectionId = this.getAttribute('data-section');
+                    
+                    // Update editor tab title
+                    const tab = document.getElementById('activeTab');
+                    tab.textContent = this.textContent;
+                    
+                    // Load the note content
+                    loadNote(sectionId);
+                    
+                    // Add terminal command
+                    addTerminalCommand(`open ${this.textContent}`, `Loaded ${this.textContent} successfully`, 'success');
+                });
+            });
+        }
+
+        // Load note content
+        function loadNote(sectionId) {
+            const noteContainer = document.getElementById('noteContainer');
+            const note = noteData[sectionId];
+            
+            if (note) {
+                noteContainer.innerHTML = `
+                    <div class="note-header">
+                        <input type="text" class="note-title" id="noteTitle" value="${note.title}" readonly>
+                        <div class="note-meta">
+                            <span class="text-gray-400">Author: <span class="text-gray-300">${note.author}</span></span>
+                            <span class="text-gray-400">Modified: <span class="text-gray-300">${note.modified}</span></span>
+                            <span class="text-gray-400">Size: <span class="text-gray-300">${note.size}</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="note-body" id="noteBody" contenteditable="false">
+                        ${note.content}
+                    </div>
+                    
+                    <div class="note-tags" id="noteTags">
+                        ${note.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    </div>
+                    
+                    <div class="tag-input-container" id="tagInputContainer" style="display: none;">
+                        <input type="text" class="tag-input" id="tagInput" placeholder="Add a hashtag...">
+                        <button class="add-tag-button" id="addTagButton">Add</button>
+                    </div>
+                    
+                    <!-- Terminal -->
+                    <div class="terminal">
+                        <div class="terminal-header">TERMINAL</div>
+                        <div class="terminal-body" id="terminalBody">
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="terminal-command">git status</span>
+                            </div>
+                            <div class="terminal-output">On branch main</div>
+                            <div class="terminal-output">Your branch is up to date with 'origin/main'.</div>
+                            <div class="terminal-output">nothing to commit, working tree clean</div>
+                            
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="terminal-command">ai analyze --context=${sectionId} --focus=innovation</span>
+                            </div>
+                            <div class="terminal-output">Analyzing content for innovations...</div>
+                            <div class="terminal-output">Found related concepts in knowledge base</div>
+                            <div class="terminal-success">Key insight: New developments in this area are emerging</div>
+                            
+                            <div class="terminal-input">
+                                <span class="terminal-prompt">$</span>
+                                <input type="text" id="terminalInput" placeholder="Type command...">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Store the current section ID for saving
+                noteContainer.setAttribute('data-current-section', sectionId);
+                
+                // Set up terminal input
+                setupTerminalInput();
+                
+                // Set up tag input
+                setupTagInput();
+                
+                // Set up tag click handlers
+                setupTagClickHandlers();
+            } else {
+                // Default content if note not found
+                noteContainer.innerHTML = `
+                    <div class="note-header">
+                        <input type="text" class="note-title" id="noteTitle" value="Note Not Found" readonly>
+                        <div class="note-meta">
+                            <span class="text-gray-400">Error: <span class="text-gray-300">Content missing</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="note-body" id="noteBody" contenteditable="false">
+                        <p>The requested note could not be found. This may be because the note hasn't been created yet or there was an error loading the content.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Set up tag input
+        function setupTagInput() {
+            const addTagButton = document.getElementById('addTagButton');
+            const tagInput = document.getElementById('tagInput');
+            
+            if (addTagButton && tagInput) {
+                addTagButton.addEventListener('click', function() {
+                    addNewTag();
+                });
+                
+                tagInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        addNewTag();
+                    }
+                });
+            }
+        }
+
+        // Add new tag
+        function addNewTag() {
+            const tagInput = document.getElementById('tagInput');
+            const noteTags = document.getElementById('noteTags');
+            const noteContainer = document.getElementById('noteContainer');
+            const sectionId = noteContainer.getAttribute('data-current-section');
+            
+            if (tagInput && noteTags && sectionId && noteData[sectionId]) {
+                const tagText = tagInput.value.trim();
+                
+                if (tagText) {
+                    // Ensure it starts with #
+                    const hashtag = tagText.startsWith('#') ? tagText : `#${tagText}`;
+                    
+                    // Add to note data
+                    if (!noteData[sectionId].tags.includes(hashtag)) {
+                        noteData[sectionId].tags.push(hashtag);
+                        
+                        // Add to UI
+                        const tagElement = document.createElement('span');
+                        tagElement.className = 'tag';
+                        tagElement.textContent = hashtag;
+                        noteTags.appendChild(tagElement);
+                        
+                        // Clear input
+                        tagInput.value = '';
+                        
+                        // Set up click handler for new tag
+                        tagElement.addEventListener('click', function() {
+                            filterByTag(hashtag);
+                        });
+                        
+                        // Show notification
+                        showNotification('Tag Added', `Added tag "${hashtag}" to note`);
+                        
+                        // Add terminal command
+                        addTerminalCommand(`tag add ${hashtag}`, `Added tag "${hashtag}"`, 'success');
+                    } else {
+                        showNotification('Tag Exists', `Tag "${hashtag}" already exists on this note`);
+                    }
+                }
+            }
+        }
+
+        // Set up tag click handlers
+        function setupTagClickHandlers() {
+            const tags = document.querySelectorAll('.tag');
+            
+            tags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const tagText = this.textContent;
+                    filterByTag(tagText);
+                });
+            });
+        }
+
+        // Filter by tag
+        function filterByTag(tag) {
+            // Show all files and subfiles
+            document.querySelectorAll('.file, .subfile').forEach(file => {
+                file.style.display = 'block';
+            });
+            
+            // Hide files that don't contain the tag
+            document.querySelectorAll('.file, .subfile').forEach(file => {
+                const sectionId = file.getAttribute('data-section');
+                if (sectionId && noteData[sectionId] && !noteData[sectionId].tags.includes(tag)) {
+                    file.style.display = 'none';
+                }
+            });
+            
+            // Show notification
+            showNotification('Filter Applied', `Showing notes with tag "${tag}"`);
+            
+            // Add terminal command
+            addTerminalCommand(`filter --tag=${tag}`, `Applied filter for tag "${tag}"`, 'success');
+        }
+
+        // Header actions functionality
+        function setupHeaderActions() {
+            const searchToggle = document.getElementById('searchToggle');
+            const settingsButton = document.getElementById('settingsButton');
+            const userButton = document.getElementById('userButton');
+            
+            searchToggle.addEventListener('click', function() {
+                const searchContainer = document.getElementById('searchContainer');
+                searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
+                
+                if (searchContainer.style.display === 'flex') {
+                    document.getElementById('searchInput').focus();
+                }
+            });
+            
+            settingsButton.addEventListener('click', function() {
+                showNotification('Settings', 'Settings panel would open here');
+            });
+            
+            userButton.addEventListener('click', function() {
+                showNotification('User Profile', 'User profile panel would open here');
+            });
+        }
+
+        // Editor actions functionality
+        function setupEditorActions() {
+            const saveButton = document.getElementById('saveButton');
+            const newFileButton = document.getElementById('newFileButton');
+            const moreButton = document.getElementById('moreButton');
+            
+            saveButton.addEventListener('click', function() {
+                saveCurrentNote();
+            });
+            
+            newFileButton.addEventListener('click', function() {
+                const fileName = prompt('Enter new file name:');
+                if (fileName) {
+                    addTerminalCommand(`touch ${fileName}`, `Created new file: ${fileName}`, 'success');
+                    showNotification('New File', `Created ${fileName}`);
+                }
+            });
+            
+            moreButton.addEventListener('click', function() {
+                showNotification('More Options', 'Additional options would appear here');
+            });
+        }
+
+        // Edit mode functionality
+        function setupEditMode() {
+            const editModeButton = document.getElementById('editModeButton');
+            let isEditMode = false;
+            
+            editModeButton.addEventListener('click', function() {
+                isEditMode = !isEditMode;
+                
+                const noteTitle = document.getElementById('noteTitle');
+                const noteBody = document.getElementById('noteBody');
+                const editorToolbar = document.getElementById('editorToolbar');
+                const tagInputContainer = document.getElementById('tagInputContainer');
+                
+                if (noteTitle && noteBody) {
+                    if (isEditMode) {
+                        // Enable edit mode
+                        noteTitle.removeAttribute('readonly');
+                        noteTitle.style.borderBottom = '1px solid #ff7e5f';
+                        noteBody.contentEditable = true;
+                        noteBody.style.border = '1px solid #333';
+                        noteBody.style.padding = '8px';
+                        noteBody.style.borderRadius = '4px';
+                        editorToolbar.style.display = 'flex';
+                        
+                        if (tagInputContainer) {
+                            tagInputContainer.style.display = 'flex';
+                        }
+                        
+                        // Update button icon
+                        this.innerHTML = '<i class="fas fa-eye"></i>';
+                        this.setAttribute('title', 'View Mode');
+                        
+                        showNotification('Edit Mode', 'You can now edit the note');
+                    } else {
+                        // Disable edit mode
+                        noteTitle.setAttribute('readonly', true);
+                        noteTitle.style.borderBottom = 'none';
+                        noteBody.contentEditable = false;
+                        noteBody.style.border = 'none';
+                        noteBody.style.padding = '0';
+                        editorToolbar.style.display = 'none';
+                        
+                        if (tagInputContainer) {
+                            tagInputContainer.style.display = 'none';
+                        }
+                        
+                        // Update button icon
+                        this.innerHTML = '<i class="fas fa-edit"></i>';
+                        this.setAttribute('title', 'Edit Mode');
+                        
+                        showNotification('View Mode', 'Edit mode disabled');
+                    }
+                }
+            });
+        }
+
+        // Toolbar actions functionality
+        function setupToolbarActions() {
+            const boldButton = document.getElementById('boldButton');
+            const italicButton = document.getElementById('italicButton');
+            const underlineButton = document.getElementById('underlineButton');
+            const listButton = document.getElementById('listButton');
+            const linkButton = document.getElementById('linkButton');
+            const codeButton = document.getElementById('codeButton');
+            const quoteButton = document.getElementById('quoteButton');
+            
+            boldButton.addEventListener('click', function() {
+                document.execCommand('bold', false, null);
+            });
+            
+            italicButton.addEventListener('click', function() {
+                document.execCommand('italic', false, null);
+            });
+            
+            underlineButton.addEventListener('click', function() {
+                document.execCommand('underline', false, null);
+            });
+            
+            listButton.addEventListener('click', function() {
+                document.execCommand('insertUnorderedList', false, null);
+            });
+            
+            linkButton.addEventListener('click', function() {
+                const url = prompt('Enter URL:');
+                if (url) {
+                    document.execCommand('createLink', false, url);
+                }
+            });
+            
+            codeButton.addEventListener('click', function() {
+                const selection = window.getSelection();
+                if (selection.toString()) {
+                    const codeElement = document.createElement('code');
+                    codeElement.style.backgroundColor = '#1a1a1a';
+                    codeElement.style.padding = '2px 4px';
+                    codeElement.style.borderRadius = '3px';
+                    codeElement.style.fontFamily = 'monospace';
+                    
+                    const range = selection.getRangeAt(0);
+                    range.surroundContents(codeElement);
+                }
+            });
+            
+            quoteButton.addEventListener('click', function() {
+                document.execCommand('formatBlock', false, 'blockquote');
+            });
+        }
+
+        // Save current note
+        function saveCurrentNote() {
+            const noteContainer = document.getElementById('noteContainer');
+            const sectionId = noteContainer.getAttribute('data-current-section');
+            const noteTitle = document.getElementById('noteTitle');
+            const noteBody = document.getElementById('noteBody');
+            
+            if (sectionId && noteTitle && noteBody && noteData[sectionId]) {
+                // Update note data
+                noteData[sectionId].title = noteTitle.value;
+                noteData[sectionId].content = noteBody.innerHTML;
+                noteData[sectionId].modified = 'Just now';
+                
+                // Update active tab title
+                const activeTab = document.getElementById('activeTab');
+                activeTab.textContent = noteTitle.value.replace(/\s+/g, '-').toLowerCase() + '.txt';
+                
+                // Add terminal command
+                addTerminalCommand(`git commit -m "Update ${noteTitle.value}"`, '[main 1a2b3c4] Updated note successfully', 'success');
+                
+                // Show notification
+                showNotification('Saved', `Changes to "${noteTitle.value}" have been saved`);
+                
+                // Update meta information
+                const metaElements = noteContainer.querySelectorAll('.note-meta .text-gray-300');
+                if (metaElements.length >= 2) {
+                    metaElements[1].textContent = 'Just now';
+                }
+            }
+        }
+
+        // Context menu functionality
+        function setupContextMenu() {
+            const contextMenu = document.getElementById('contextMenu');
+            const contextMenuItems = document.querySelectorAll('.context-menu-item');
+            
+            // Show/hide context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                contextMenu.classList.add('show');
+                contextMenu.style.left = e.pageX + 'px';
+                contextMenu.style.top = e.pageY + 'px';
+            });
+            
+            document.addEventListener('click', function() {
+                contextMenu.classList.remove('show');
+            });
+            
+            // Context menu items
+            contextMenuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Remove active class from all items
+                    contextMenuItems.forEach(i => i.classList.remove('active'));
+                    // Add active class to clicked item
+                    this.classList.add('active');
+                    
+                    // Hide context menu
+                    contextMenu.classList.remove('show');
+                    
+                    // Get filter value
+                    const filter = this.getAttribute('data-filter');
+                    
+                    // Apply filter
+                    applyFilter(filter);
+                    
+                    // Add terminal command
+                    addTerminalCommand(`filter --type=${filter}`, `Applied filter: ${filter}`, 'success');
+                });
+            });
+        }
+
+        // Apply filter to files
+        function applyFilter(filterType) {
+            const files = document.querySelectorAll('.file');
+            const subfiles = document.querySelectorAll('.subfile');
+            
+            // Reset all files to visible
+            files.forEach(file => {
+                file.style.display = 'block';
+            });
+            
+            // Reset all subfiles to visible
+            subfiles.forEach(subfile => {
+                subfile.style.display = 'block';
+            });
+            
+            // Apply filter based on type
+            switch(filterType) {
+                case 'verified':
+                    // In a real app, this would filter to show only verified files
+                    showNotification('Filter Applied', 'Showing only verified files');
+                    break;
+                case 'recent':
+                    // In a real app, this would filter to show only recent files
+                    showNotification('Filter Applied', 'Showing only recent files');
+                    break;
+                case 'popular':
+                    // In a real app, this would filter to show only popular files
+                    showNotification('Filter Applied', 'Showing only popular files');
+                    break;
+                case 'all':
+                default:
+                    showNotification('Filter Applied', 'Showing all files');
+                    break;
+            }
+        }
+
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                if (searchTerm.length > 0) {
+                    // Filter files based on search term
+                    const files = document.querySelectorAll('.file');
+                    const subfiles = document.querySelectorAll('.subfile');
+                    let matchCount = 0;
+                    
+                    files.forEach(file => {
+                        const fileName = file.textContent.toLowerCase();
+                        if (fileName.includes(searchTerm)) {
+                            file.style.display = 'block';
+                            matchCount++;
+                        } else {
+                            file.style.display = 'none';
+                        }
+                    });
+                    
+                    subfiles.forEach(subfile => {
+                        const fileName = subfile.textContent.toLowerCase();
+                        if (fileName.includes(searchTerm)) {
+                            subfile.style.display = 'block';
+                            matchCount++;
+                        } else {
+                            subfile.style.display = 'none';
+                        }
+                    });
+                    
+                    // Add terminal command
+                    addTerminalCommand(`search "${searchTerm}"`, `Found ${matchCount} matching files`, 'output');
+                } else {
+                    // Reset all files to visible
+                    const files = document.querySelectorAll('.file');
+                    const subfiles = document.querySelectorAll('.subfile');
+                    files.forEach(file => {
+                        file.style.display = 'block';
+                    });
+                    subfiles.forEach(subfile => {
+                        subfile.style.display = 'block';
+                    });
+                }
+            });
+        }
+
+        // Voice button functionality
+        function setupVoiceButton() {
+            const voiceButton = document.getElementById('voiceButton');
+            
+            voiceButton.addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                if (this.classList.contains('active')) {
+                    addTerminalCommand('voice start', 'Voice recognition activated', 'success');
+                    showNotification('Voice Input', 'Listening... Speak now');
+                    
+                    // Simulate voice recognition after 3 seconds
+                    setTimeout(() => {
+                        this.classList.remove('active');
+                        addTerminalCommand('voice stop', 'Voice recognition stopped', 'output');
+                        
+                        // Simulate voice command
+                        const simulatedCommand = 'list';
+                        document.getElementById('searchInput').value = simulatedCommand;
+                        
+                        // Trigger search
+                        const event = new Event('input', { bubbles: true });
+                        document.getElementById('searchInput').dispatchEvent(event);
+                        
+                        showNotification('Voice Input', `Recognized: "${simulatedCommand}"`);
+                        
+                        // Process the command
+                        processTerminalCommand(simulatedCommand);
+                    }, 3000);
+                } else {
+                    addTerminalCommand('voice stop', 'Voice recognition stopped', 'output');
+                    showNotification('Voice Input', 'Voice recognition stopped');
+                }
+            });
+        }
+
+        // Command palette functionality
+        function setupCommandPalette() {
+            const commandPaletteItems = document.querySelectorAll('.command-palette-item');
+            
+            commandPaletteItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Toggle active state
+                    commandPaletteItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Get command title
+                    const title = this.getAttribute('title');
+                    
+                    // Execute command
+                    executeCommand(title);
+                    
+                    // Remove active state after a delay
+                    setTimeout(() => {
+                        this.classList.remove('active');
+                    }, 1000);
+                });
+            });
+        }
+
+        // Execute command from command palette
+        function executeCommand(command) {
+            switch(command) {
+                case 'New Note':
+                    const fileName = prompt('Enter new note name:');
+                    if (fileName) {
+                        addTerminalCommand(`new ${fileName}`, `Created new note: ${fileName}`, 'success');
+                        showNotification('New Note', `Created ${fileName}`);
+                    }
+                    break;
+                case 'Search':
+                    document.getElementById('searchToggle').click();
+                    break;
+                case 'Filter':
+                    // Show context menu
+                    const contextMenu = document.getElementById('contextMenu');
+                    contextMenu.classList.add('show');
+                    contextMenu.style.left = '50%';
+                    contextMenu.style.top = '50%';
+                    contextMenu.style.transform = 'translate(-50%, -50%)';
+                    break;
+                case 'AI Analysis':
+                    addTerminalCommand('ai analyze --all', 'Analyzing all notes for insights...', 'output');
+                    setTimeout(() => {
+                        addTerminalCommand('', 'Analysis complete. Key insights:', 'success');
+                        addTerminalCommand('', '- Sustainability topics are trending', 'output');
+                        addTerminalCommand('', '- Material innovations are frequently referenced', 'output');
+                    }, 2000);
+                    showNotification('AI Analysis', 'Analysis started. Check terminal for results.');
+                    break;
+                case 'Export':
+                    addTerminalCommand('export --format=pdf', 'Exporting notes as PDF...', 'output');
+                    setTimeout(() => {
+                        addTerminalCommand('', 'Export complete: notes.pdf', 'success');
+                        showNotification('Export Complete', 'Notes exported as PDF');
+                    }, 1500);
+                    break;
+                default:
+                    console.log('Unknown command:', command);
+            }
+        }
+
+        // Terminal functionality
+        function setupTerminal() {
+            // Terminal setup is handled in loadNote function
+        }
+
+        // Setup terminal input
+        function setupTerminalInput() {
+            const terminalInput = document.getElementById('terminalInput');
+            
+            if (terminalInput) {
+                terminalInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        const command = this.value.trim();
+                        
+                        if (command) {
+                            // Add command to terminal
+                            addTerminalCommand(command, '', 'command');
+                            
+                            // Process command
+                            processTerminalCommand(command);
+                            
+                            // Clear input
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+        }
+
+        // Process terminal command
+        function processTerminalCommand(command) {
+            // Simple command processing
+            if (command === 'help') {
+                addTerminalCommand('', 'Available commands:', 'output');
+                addTerminalCommand('', 'help - Show this help message', 'output');
+                addTerminalCommand('', 'clear - Clear terminal', 'output');
+                addTerminalCommand('', 'status - Show git status', 'output');
+                addTerminalCommand('', 'list - List all notes', 'output');
+                addTerminalCommand('', 'make new note - Create a new note', 'output');
+                addTerminalCommand('', 'ai analyze - Analyze notes', 'output');
+                addTerminalCommand('', 'search [term] - Search notes', 'output');
+                addTerminalCommand('', 'edit - Toggle edit mode', 'output');
+                addTerminalCommand('', 'save - Save current note', 'output');
+            } else if (command === 'clear') {
+                const terminalBody = document.getElementById('terminalBody');
+                terminalBody.innerHTML = `
+                    <div class="terminal-input">
+                        <span class="terminal-prompt">$</span>
+                        <input type="text" id="terminalInput" placeholder="Type command...">
+                    </div>
+                `;
+                setupTerminalInput();
+            } else if (command === 'status') {
+                addTerminalCommand('', 'On branch main', 'output');
+                addTerminalCommand('', 'Your branch is up to date with \'origin/main\'.', 'output');
+                addTerminalCommand('', 'nothing to commit, working tree clean', 'output');
+            } else if (command === 'list') {
+                addTerminalCommand('', 'Available notes:', 'output');
+                
+                // List all notes
+                Object.keys(noteData).forEach(key => {
+                    const note = noteData[key];
+                    addTerminalCommand('', `- ${note.title} (${key})`, 'terminal-list');
+                });
+            } else if (command === 'make new note') {
+                const noteName = prompt('Enter note name:');
+                if (noteName) {
+                    // Generate a unique ID for the note
+                    const noteId = noteName.toLowerCase().replace(/\s+/g, '-');
+                    
+                    // Create the new note
+                    noteData[noteId] = {
+                        title: noteName,
+                        author: 'current_user',
+                        modified: 'Just now',
+                        size: '0.1 KB',
+                        content: '<p>This is a new note. Start writing here...</p>',
+                        tags: ['#new']
+                    };
+                    
+                    // Show success message
+                    addTerminalCommand('', `Created new note: ${noteName} (${noteId})`, 'success');
+                    showNotification('New Note', `Created note "${noteName}"`);
+                    
+                    // Load the new note
+                    loadNote(noteId);
+                    
+                    // Update the active tab
+                    document.getElementById('activeTab').textContent = `${noteId}.txt`;
+                }
+            } else if (command.startsWith('search ')) {
+                const searchTerm = command.substring(7);
+                document.getElementById('searchInput').value = searchTerm;
+                
+                // Trigger search
+                const event = new Event('input', { bubbles: true });
+                document.getElementById('searchInput').dispatchEvent(event);
+                
+                // Show search container if not visible
+                if (document.getElementById('searchContainer').style.display === 'none') {
+                    document.getElementById('searchToggle').click();
+                }
+            } else if (command === 'ai analyze') {
+                addTerminalCommand('', 'Analyzing all notes for insights...', 'output');
+                setTimeout(() => {
+                    addTerminalCommand('', 'Analysis complete. Key insights:', 'success');
+                    addTerminalCommand('', '- Sustainability topics are trending', 'output');
+                    addTerminalCommand('', '- Material innovations are frequently referenced', 'output');
+                }, 2000);
+            } else if (command === 'edit') {
+                document.getElementById('editModeButton').click();
+            } else if (command === 'save') {
+                saveCurrentNote();
+            } else {
+                addTerminalCommand('', `Command not found: ${command}`, 'output');
+                addTerminalCommand('', 'Type "help" for available commands', 'output');
+            }
+        }
+
+        // Add terminal command
+        function addTerminalCommand(command, output, type = 'output') {
+            const terminalBody = document.getElementById('terminalBody');
+            
+            if (!terminalBody) return;
+            
+            // Remove input line temporarily
+            const inputLine = terminalBody.querySelector('.terminal-input');
+            if (inputLine) {
+                inputLine.remove();
+            }
+            
+            // Add command line
+            if (command) {
+                const commandLine = document.createElement('div');
+                commandLine.className = 'terminal-line';
+                commandLine.innerHTML = `<span class="terminal-prompt">$</span><span class="terminal-command">${command}</span>`;
+                terminalBody.appendChild(commandLine);
+            }
+            
+            // Add output
+            if (output) {
+                if (type === 'terminal-list') {
+                    const outputLine = document.createElement('div');
+                    outputLine.className = type;
+                    outputLine.textContent = output;
+                    terminalBody.appendChild(outputLine);
+                } else {
+                    const outputLine = document.createElement('div');
+                    outputLine.className = type;
+                    outputLine.textContent = output;
+                    terminalBody.appendChild(outputLine);
+                }
+            }
+            
+            // Add input line back
+            const newInputLine = document.createElement('div');
+            newInputLine.className = 'terminal-input';
+            newInputLine.innerHTML = `
+                <span class="terminal-prompt">$</span>
+                <input type="text" id="terminalInput" placeholder="Type command...">
+            `;
+            terminalBody.appendChild(newInputLine);
+            
+            // Scroll to bottom
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+            
+            // Set up terminal input
+            setupTerminalInput();
+        }
+
+        // Show notification
+        function showNotification(title, message) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notificationTitle');
+            const notificationMessage = document.getElementById('notificationMessage');
+            
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            
+            notification.classList.add('show');
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
